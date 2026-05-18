@@ -1,13 +1,32 @@
-/* eslint-disable */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { setCurrentTodo } from '../../features/currentTodo';
-import { Loader } from '../Loader';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { getUser } from '../../api';
+import { User } from '../../types/User';
+import { Loader } from '../Loader/Loader';
 
 export const TodoModal: React.FC = () => {
   const currentTodo = useAppSelector(state => state.currentTodo);
   const dispatch = useAppDispatch();
+  const [user, setUser] = useState<User | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+
+  useEffect(() => {
+    if (!currentTodo) {
+      setUser(null);
+      setLoadingUser(false);
+
+      return;
+    }
+
+    setUser(null);
+    setLoadingUser(true);
+
+    getUser(currentTodo.userId).then(fetchedUser => {
+      setUser(fetchedUser);
+      setLoadingUser(false);
+    });
+  }, [currentTodo]);
 
   if (!currentTodo) {
     return null;
@@ -15,48 +34,32 @@ export const TodoModal: React.FC = () => {
 
   return (
     <div className="modal is-active" data-cy="modal">
-      <div
-        className="modal-background"
-        onClick={() => dispatch(setCurrentTodo(null))}
-      />
-
-      {/* Loader можна показувати, якщо ти додаси loading state */}
-      {/* <Loader /> */}
-
+      <div className="modal-background"></div>
       <div className="modal-card">
-        <header className="modal-card-head">
-          <div
-            className="modal-card-title has-text-weight-medium"
-            data-cy="modal-header"
-          >
-            Todo #{currentTodo.id}
-          </div>
-
+        <header className="modal-card-head" data-cy="modal-header">
+          <p className="modal-card-title">Todo #{currentTodo.id}</p>
           <button
-            type="button"
             className="delete"
+            aria-label="close"
             data-cy="modal-close"
             onClick={() => dispatch(setCurrentTodo(null))}
           />
         </header>
 
-        <div className="modal-card-body">
-          <p className="block" data-cy="modal-title">
-            {currentTodo.title}
-          </p>
+        <section className="modal-card-body">
+          <p data-cy="modal-title">{currentTodo.title}</p>
 
-          <p className="block" data-cy="modal-user">
-            {currentTodo.completed ? (
-              <strong className="has-text-success">Done</strong>
-            ) : (
-              <strong className="has-text-danger">Planned</strong>
-            )}
-            {' by '}
-            <a href={`mailto:${currentTodo.user.email}`}>
-              {currentTodo.user.name}
-            </a>
-          </p>
-        </div>
+          {loadingUser ? (
+            <Loader />
+          ) : (
+            user && (
+              <p data-cy="modal-user">
+                {currentTodo.completed ? 'Done by ' : 'Planned by '}
+                {user.name}
+              </p>
+            )
+          )}
+        </section>
       </div>
     </div>
   );

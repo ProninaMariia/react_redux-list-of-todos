@@ -1,7 +1,6 @@
-/* eslint-disable */
 import React from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { setQuery, setStatus } from '../features/filter';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { setQuery, setStatus } from '../../features/filter';
 
 export const TodoFilter: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -18,7 +17,9 @@ export const TodoFilter: React.FC = () => {
             data-cy="statusSelect"
             value={status}
             onChange={e =>
-              dispatch(setStatus(e.target.value as 'all' | 'active' | 'completed'))
+              dispatch(
+                setStatus(e.target.value as 'all' | 'active' | 'completed'),
+              )
             }
           >
             <option value="all">All</option>
@@ -42,13 +43,15 @@ export const TodoFilter: React.FC = () => {
         </span>
 
         <span className="icon is-right" style={{ pointerEvents: 'all' }}>
-          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-          <button
-            data-cy="clearSearchButton"
-            type="button"
-            className="delete"
-            onClick={() => dispatch(setQuery(''))}
-          />
+          {query !== '' && (
+            <button
+              data-cy="clearSearchButton"
+              type="button"
+              className="delete"
+              aria-label="clear search"
+              onClick={() => dispatch(setQuery(''))}
+            />
+          )}
         </span>
       </p>
     </form>

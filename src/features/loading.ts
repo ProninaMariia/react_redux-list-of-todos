@@ -9,3 +9,4 @@ export const loadingSlice = createSlice({
 });
 
 export const { setLoading } = loadingSlice.actions;
+export default loadingSlice.reducer;

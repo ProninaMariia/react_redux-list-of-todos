@@ -1,36 +1,41 @@
-import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "./app/hooks";
-import { setTodos } from "./features/todos";
-import { setLoading } from "./features/features/loading";
-import { getTodos } from "./api";
+import { useEffect } from 'react';
+import './App.scss';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { setTodos } from './features/todos';
+import { setLoading } from './features/loading';
+import { getTodos } from './api';
+import { Loader } from './components/Loader/Loader';
+import { TodoList } from './components/TodoList/TodoList';
+import { TodoFilter } from './components/TodoFilter/TodoFilter';
+import { TodoModal } from './components/TodoModal/TodoModal';
 
 export const App = () => {
   const dispatch = useAppDispatch();
-  const todos = useAppSelector((state) => state.todos);
-  const loading = useAppSelector((state) => state.loading);
+  const loading = useAppSelector(state => state.loading);
 
   useEffect(() => {
     const fetchTodos = async () => {
       dispatch(setLoading(true));
       const todosFromApi = await getTodos();
+
       dispatch(setTodos(todosFromApi));
       dispatch(setLoading(false));
     };
+
     fetchTodos();
   }, [dispatch]);
 
   return (
-    <div>
+    <div className="App">
       <h1>Todo List</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <ul>
-          {todos.map((todo) => (
-            <li key={todo.id}>{todo.title}</li>
-          ))}
-        </ul>
-      )}
+
+      {loading && <Loader />}
+
+      <TodoFilter />
+
+      <TodoList />
+
+      <TodoModal />
     </div>
   );
 };
