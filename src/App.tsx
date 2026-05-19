@@ -16,10 +16,13 @@ export const App = () => {
   useEffect(() => {
     const fetchTodos = async () => {
       dispatch(setLoading(true));
-      const todosFromApi = await getTodos();
+      try {
+        const todosFromApi = await getTodos();
 
-      dispatch(setTodos(todosFromApi));
-      dispatch(setLoading(false));
+        dispatch(setTodos(todosFromApi));
+      } finally {
+        dispatch(setLoading(false));
+      }
     };
 
     fetchTodos();
@@ -29,13 +32,15 @@ export const App = () => {
     <div className="App">
       <h1>Todo List</h1>
 
-      {loading && <Loader />}
-
-      <TodoFilter />
-
-      <TodoList />
-
-      <TodoModal />
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          <TodoFilter />
+          <TodoList />
+          <TodoModal />
+        </>
+      )}
     </div>
   );
 };
